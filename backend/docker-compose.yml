@@ -1,0 +1,16 @@
+version: '2'
+services:
+  log-generator:
+    image: log-generator
+    volumes:
+      - /tmp/dummylogs.log:/var/log//dummylogs.log
+
+  log-collector:
+    image: log-collector
+    volumes:
+      - /tmp/dummylogs.log:/var/log//dummylogs.log
+    depends_on:
+      - log-generator
+
+  log-indexer:
+    image: log-indexer
