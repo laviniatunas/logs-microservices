@@ -1,0 +1,70 @@
+version: "3.7"
+services:
+  es01:
+    image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      node.name: es01
+      discovery.seed_hosts: es01
+      cluster.initial_master_nodes: es01
+      cluster.name: mycluster
+      bootstrap.memory_lock: "true"
+      ES_JAVA_OPTS: -Xms256m -Xmx256m
+    volumes:
+      - "es-data-es01:/usr/share/elasticsearch/data"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test: [ "CMD-SHELL", "curl http://localhost:9200" ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    # networks:
+    #   mynetwork:
+    #     ipv4_address: 172.29.0.2
+
+  kibana:
+    depends_on:
+      es01:
+        condition: service_healthy
+    image: docker.elastic.co/kibana/kibana-oss:7.10.2
+    labels:
+      co.elastic.logs/module: kibana
+    volumes:
+      - certs:/usr/share/kibana/config/certs
+      - kibanadata:/usr/share/kibana/data
+    ports:
+      - 5601:5601
+    environment:
+      # - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=http://es01:9200
+      # - ELASTICSEARCH_USERNAME=kibana_system
+      # - ELASTICSEARCH_PASSWORD=abcdef1234
+      # - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+      # - XPACK_SECURITY_ENCRYPTIONKEY=c34d38b3a14956121ff2170e5030b471551370178f43e5626eec58b04a30fae2
+      # - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=c34d38b3a14956121ff2170e5030b471551370178f43e5626eec58b04a30fae2
+      # - XPACK_REPORTING_ENCRYPTIONKEY=c34d38b3a14956121ff2170e5030b471551370178f43e5626eec58b04a30fae2
+      # mem_limit: 1073741824
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'"
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+volumes:
+  es-data-es01:
+  certs:
+    driver: local
+  kibanadata:
+    driver: local
+
+networks:
+  mynetwork:
