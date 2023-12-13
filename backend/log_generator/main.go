@@ -22,8 +22,8 @@ func main() {
 
 	possibleLogs := []string{"Detected malicious files: %v", "Program exited with error code %v", "Tried connectiong to host %v times", "Processed %v files", "Connection timed out after %v seconds"}
 
-	for i := 0; i < 22; i++ {
-		fmt.Printf("%v\n", i)
+	for {
+		fmt.Printf("New log available")
 		code := rand.Intn(150)
 		logMessage := possibleLogs[rand.Intn(len(possibleLogs))]
 		logrus.SetOutput(f)

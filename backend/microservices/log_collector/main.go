@@ -56,7 +56,7 @@ func generateJson(logLine string) []byte {
 	}
 
 	timeStr := exprTime.FindString(logLine)
-	parsedTime, err := time.Parse("2006-01-02T15:04:05", strings.Split(strings.Split(timeStr, "\"")[1], "+")[0])
+	parsedTime, err := time.Parse("2006-01-02T15:04:05", strings.Split(strings.Split(timeStr, "\"")[1], "Z")[0])
 	if err != nil {
 		log.Fatalf("Could not find time regex, error: %v", err)
 	}
