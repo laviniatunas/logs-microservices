@@ -1,7 +1,7 @@
-version: "3.7"
+version: "3"
 services:
   es01:
-    image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2"
+    image: "elasticsearch:7.17.16"
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -23,15 +23,14 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
-    # networks:
-    #   mynetwork:
-    #     ipv4_address: 172.29.0.2
+    networks:
+      - mynetwork
 
   kibana:
     depends_on:
       es01:
         condition: service_healthy
-    image: docker.elastic.co/kibana/kibana-oss:7.10.2
+    image: kibana:7.17.16
     labels:
       co.elastic.logs/module: kibana
     volumes:
@@ -40,15 +39,7 @@ services:
     ports:
       - 5601:5601
     environment:
-      # - SERVERNAME=kibana
       - ELASTICSEARCH_HOSTS=http://es01:9200
-      # - ELASTICSEARCH_USERNAME=kibana_system
-      # - ELASTICSEARCH_PASSWORD=abcdef1234
-      # - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
-      # - XPACK_SECURITY_ENCRYPTIONKEY=c34d38b3a14956121ff2170e5030b471551370178f43e5626eec58b04a30fae2
-      # - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=c34d38b3a14956121ff2170e5030b471551370178f43e5626eec58b04a30fae2
-      # - XPACK_REPORTING_ENCRYPTIONKEY=c34d38b3a14956121ff2170e5030b471551370178f43e5626eec58b04a30fae2
-      # mem_limit: 1073741824
     healthcheck:
       test:
         [
@@ -58,6 +49,8 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
+    networks:
+      - mynetwork
 
 volumes:
   es-data-es01:
@@ -68,3 +61,5 @@ volumes:
 
 networks:
   mynetwork:
+    driver: bridge
+    name: elasticsearchnetwork

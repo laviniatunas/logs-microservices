@@ -1,16 +1,38 @@
-version: '2'
+version: "3"
 services:
   log-generator:
-    image: log-generator
+    # build: ./log_generator
+    image: "log-generator"
     volumes:
       - /tmp/dummylogs.log:/var/log//dummylogs.log
 
   log-collector:
-    image: log-collector
+    build: ./microservices/log_collector
+    env_file:
+      - .env
     volumes:
       - /tmp/dummylogs.log:/var/log//dummylogs.log
     depends_on:
       - log-generator
 
   log-indexer:
-    image: log-indexer
+    build: ./microservices/log_indexer #log-indexer image is before work with ES
+    env_file:
+      - .env
+    networks:
+      - elasticsearchnetwork
+
+networks:
+  elasticsearchnetwork:
+    external:
+      name: elasticsearchnetwork
+
+#   log-indexer:
+#     image: log-indexer
+#     networks:
+#       - my-proxy-network
+
+# networks:
+#   my-proxy-network:
+#     external:
+#       name: elasticsearchnetwork
