@@ -16,6 +16,7 @@ import (
 type Consumer struct {
 	Reader *kafka.Reader
 	Dialer *kafka.Dialer
+	EsRepo domain.EsInterface
 	Topic  string
 }
 
@@ -51,11 +52,13 @@ func (c *Consumer) Start() {
 			break
 		}
 
-		fmt.Printf("Read Message %+v\n", readLog)
+		fmt.Printf("Read Message from Kafka: %+v\n", readLog)
 		err = c.Reader.CommitMessages(ctx, msg)
 		if err != nil {
 			logrus.Errorf("Failed to commit kafka message %v", err)
 			break
 		}
+		fmt.Printf("Kafka next for log %v", readLog.Message)
+		c.EsRepo.IndexLog(ctx, readLog)
 	}
 }

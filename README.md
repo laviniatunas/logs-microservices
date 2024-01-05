@@ -9,3 +9,7 @@
 
 * Kafka config is defined under **externals/kafka**
 * In the docker-compose file we also build the **kowl** image to see the logs that are on the Kafka topic (Note that it might take about 30 seconds to 1 minute to be visible due to networking)
+
+# Useful commands
+* docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <elasticsearch_container_id_or_name>
+* * nc -z localhost 29092

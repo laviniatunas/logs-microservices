@@ -1,0 +1,31 @@
+version: "3"
+services:
+  ui:
+    build: ./frontend/web/webapp
+    ports:
+      - 4200:80
+
+#     depends_on:
+#       - api
+
+#   nginx:
+#     image: nginx:latest
+#     volumes:
+#       - ./frontend/web/webapp/dist:/usr/share/nginx/html
+#       - ./nginx.conf:/etc/nginx/conf.d/default.conf
+#     ports:
+#       - "8888:80"
+
+#   api:
+#     build: ./backend/api
+#     ports:
+#       - 8000:8000
+#     env_file:
+#       - ./backend/api/.env
+#     networks:
+#       - elasticsearchnetwork
+
+# networks:
+#   elasticsearchnetwork:
+#     external:
+#       name: elasticsearchnetwork
