@@ -26,7 +26,7 @@ func NewEsRepo(esClient *es7.Client) EsRepo {
 	}
 }
 
-func (e *EsRepo) GetLogs(ctx context.Context) error {
+func (e *EsRepo) GetLogs(ctx context.Context) ([]domain.Log, error) {
 	query := `{"query": {"match_all" : {}}}`
 	var b strings.Builder
 	b.WriteString(query)
@@ -43,6 +43,7 @@ func (e *EsRepo) GetLogs(ctx context.Context) error {
 
 	if err != nil {
 		logrus.Errorf("Elasticsearch Search() API ERROR:", err)
+		return nil, err
 	} else {
 		logrus.Println("res TYPE:", reflect.TypeOf(res))
 	}
@@ -50,6 +51,7 @@ func (e *EsRepo) GetLogs(ctx context.Context) error {
 	buf, err := io.ReadAll(res.Body)
 	if err != nil {
 		logrus.Errorf("Error reading Body:", err)
+		return nil, err
 	}
 	res.Body.Close()
 
@@ -57,12 +59,15 @@ func (e *EsRepo) GetLogs(ctx context.Context) error {
 	err = json.Unmarshal(buf, transformedResp)
 	if err != nil {
 		logrus.Errorf("Failed to unmarshal elasticsearch response %v", err)
+		return nil, err
 	}
 	logs := make([]domain.Log, 0)
 	for _, log := range transformedResp.Hits.Hits {
 		logs = append(logs, log.Source)
 	}
 	logrus.Printf("String is %+v", logs)
+
+	return logs, nil
 
 	// logBytes, err := json.Marshal(log)
 	// if err != nil {
@@ -82,5 +87,4 @@ func (e *EsRepo) GetLogs(ctx context.Context) error {
 	// 	return fmt.Errorf("Failed to do index request %v", err)
 	// }
 	// logrus.Infof("Response is = %v", response.StatusCode)
-	return nil
 }

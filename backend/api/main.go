@@ -18,8 +18,21 @@ func setupRouter(esRepo repository.EsRepo) *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/logs", func(c *gin.Context) {
-		esRepo.GetLogs(c)
-		c.String(http.StatusOK, "pong")
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+		logs, err := esRepo.GetLogs(c)
+		if err != nil {
+			logrus.Errorf("Error in /logs call %v", err)
+		} else {
+			c.JSON(http.StatusOK, gin.H{
+				"code":    http.StatusOK,
+				"message": logs,
+			})
+		}
+
 	})
 
 	return r

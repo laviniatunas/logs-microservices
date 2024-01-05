@@ -9,7 +9,7 @@ services:
   log-collector:
     build: ./microservices/log_collector
     env_file:
-      - .env
+      - ./microservices/log_collector/.env
     volumes:
       - /tmp/dummylogs.log:/var/log//dummylogs.log
     depends_on:
@@ -18,7 +18,7 @@ services:
   log-indexer:
     build: ./microservices/log_indexer #log-indexer image is before work with ES
     env_file:
-      - .env
+      - ./microservices/log_indexer/.env
     networks:
       - elasticsearchnetwork
 
