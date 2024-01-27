@@ -11,6 +11,48 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type LogMessage struct {
+	Message  string
+	LogLevel string
+}
+
+var (
+	possibleLogs = []LogMessage{
+		{
+			Message:  "Detected malicious files: %v",
+			LogLevel: "INFO",
+		},
+		{
+			Message:  "Program exited with error code %v",
+			LogLevel: "ERROR",
+		},
+		{
+			Message:  "Tried connectiong to host %v times",
+			LogLevel: "INFO",
+		},
+		{
+			Message:  "Processed %v files",
+			LogLevel: "INFO",
+		},
+		{
+			Message:  "Connection timed out after %v seconds",
+			LogLevel: "ERROR",
+		},
+		{
+			Message:  "Indexer failed with error %v",
+			LogLevel: "ERROR",
+		},
+		{
+			Message:  "Something went wrong, please retry in %v seconds",
+			LogLevel: "INFO",
+		},
+		{
+			Message:  "Too many requests at the same time. Please wait %v seconds before trying another request",
+			LogLevel: "INFO",
+		},
+	}
+)
+
 func main() {
 	godotenv.Load()
 	var logFile = os.Getenv("LOG_FILE")
@@ -20,14 +62,16 @@ func main() {
 	}
 	defer f.Close()
 
-	possibleLogs := []string{"Detected malicious files: %v", "Program exited with error code %v", "Tried connectiong to host %v times", "Processed %v files", "Connection timed out after %v seconds"}
-
 	for {
 		fmt.Printf("New log available")
 		code := rand.Intn(150)
 		logMessage := possibleLogs[rand.Intn(len(possibleLogs))]
 		logrus.SetOutput(f)
-		logrus.Infof(logMessage, code)
+		if logMessage.LogLevel == "ERROR" {
+			logrus.Errorf(logMessage.Message, code)
+		} else {
+			logrus.Infof(logMessage.Message, code)
+		}
 		time.Sleep(time.Second * 3)
 	}
 }

@@ -1,8 +1,10 @@
 version: "3"
 services:
   log-generator:
-    # build: ./log_generator
-    image: "log-generator"
+    build: ./log_generator
+    env_file:
+      - ./log_generator/.env
+    # image: "log-generator"
     volumes:
       - /tmp/dummylogs.log:/var/log//dummylogs.log
 

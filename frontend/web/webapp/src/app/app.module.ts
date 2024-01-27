@@ -14,8 +14,10 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table'
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APIInterceptor } from './http-interceptor';
+import { SseService } from './sse-service';
 
 
 @NgModule({
@@ -37,7 +39,8 @@ import { APIInterceptor } from './http-interceptor';
     MatGridListModule,
     MatCardModule,
     MatMenuModule,
-    MatTableModule
+    MatTableModule,
+    MatSnackBarModule,
   ],
   providers: [
     provideClientHydration(),
@@ -45,7 +48,8 @@ import { APIInterceptor } from './http-interceptor';
       provide: HTTP_INTERCEPTORS,
       useClass: APIInterceptor,
       multi: true,
-    }
+    },
+    SseService
   ],
   bootstrap: [AppComponent]
 })

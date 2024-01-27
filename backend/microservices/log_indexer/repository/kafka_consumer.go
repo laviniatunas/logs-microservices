@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log_indexer/domain"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -14,10 +15,11 @@ import (
 )
 
 type Consumer struct {
-	Reader *kafka.Reader
-	Dialer *kafka.Dialer
-	EsRepo domain.EsInterface
-	Topic  string
+	Reader    *kafka.Reader
+	Dialer    *kafka.Dialer
+	EsRepo    domain.EsInterface
+	AlertRepo domain.AlertsInterface
+	Topic     string
 }
 
 func (c *Consumer) CreateConnection() {
@@ -51,6 +53,7 @@ func (c *Consumer) Start() {
 			logrus.Errorf("Failed to parse kafka message %v", err)
 			break
 		}
+		c.checkForAlerts(ctx, &readLog, msg.Value)
 
 		fmt.Printf("Read Message from Kafka: %+v\n", readLog)
 		err = c.Reader.CommitMessages(ctx, msg)
@@ -60,5 +63,11 @@ func (c *Consumer) Start() {
 		}
 		fmt.Printf("Kafka next for log %v", readLog.Message)
 		c.EsRepo.IndexLog(ctx, readLog)
+	}
+}
+
+func (c *Consumer) checkForAlerts(ctx context.Context, log *domain.Log, logBytes []byte) {
+	if strings.ToLower(log.Level) == "error" {
+		c.AlertRepo.TriggerAlert(ctx, logBytes)
 	}
 }

@@ -27,7 +27,8 @@ func NewEsRepo(esClient *es7.Client) EsRepo {
 }
 
 func (e *EsRepo) GetLogs(ctx context.Context) ([]domain.Log, error) {
-	query := `{"query": {"match_all" : {}}}`
+	// query := `{"query": {"match_all" : {}}}`
+	query := `{"query": { "match_all": {}}, "sort": [{"date": {"order": "desc"}}]}`
 	var b strings.Builder
 	b.WriteString(query)
 	read := strings.NewReader(b.String())
@@ -38,7 +39,7 @@ func (e *EsRepo) GetLogs(ctx context.Context) ([]domain.Log, error) {
 		e.esClient.Search.WithBody(read),
 		e.esClient.Search.WithTrackTotalHits(true),
 		e.esClient.Search.WithPretty(),
-		e.esClient.Search.WithSize(2),
+		e.esClient.Search.WithSize(500),
 	)
 
 	if err != nil {
