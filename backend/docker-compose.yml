@@ -6,14 +6,14 @@ services:
       - ./log_generator/.env
     # image: "log-generator"
     volumes:
-      - /tmp/dummylogs.log:/var/log//dummylogs.log
+      - /tmp/dummylogs.log:/var/log/dummylogs.log
 
   log-collector:
     build: ./microservices/log_collector
     env_file:
       - ./microservices/log_collector/.env
     volumes:
-      - /tmp/dummylogs.log:/var/log//dummylogs.log
+      - /tmp/dummylogs.log:/var/log/dummylogs.log
     depends_on:
       - log-generator
 
